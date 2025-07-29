@@ -64,11 +64,11 @@
         <header class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md sticky top-0 z-30 flex-shrink-0">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4">
                 <div class="flex items-center justify-between">
-                     <h1 class="text-2xl font-bold">ケアリム <span class="text-lg align-baseline font-normal">テストリリースver</span></h1>
+                     <h1 class="text-xl sm:text-2xl font-bold">ケアリム <span class="text-base sm:text-lg align-baseline font-normal">テストリリースver</span></h1>
                      <i class="ph-duotone ph-rocket-launch text-4xl opacity-50"></i>
                 </div>
                  <div class="mt-2 text-center">
-                    <span class="inline-block bg-white/20 backdrop-blur-sm text-white font-bold px-4 py-1.5 rounded-full text-base border border-white/30 shadow-lg">
+                    <span class="inline-block bg-white/20 backdrop-blur-sm text-white font-bold px-3 sm:px-4 py-1.5 rounded-full text-sm sm:text-base border border-white/30 shadow-lg">
                         <i class="ph-fill ph-sparkle text-yellow-300 mr-1"></i>
                         人気のスポット案件のみ一足先に掲載中！
                     </span>
@@ -100,7 +100,7 @@
 
             <!-- Right Column: Job Details -->
             <main id="job-details-column" class="hidden md:block md:col-span-7 lg:col-span-8 xl:col-span-9 w-full h-full relative">
-                 <a id="apply-button" href="https://docs.google.com/forms/d/e/1FAIpQLSdh89T9IMCNHWrSHPsOrpix81NZU0NmgUNzBPHHqUcE3AJ8XQ/viewform" target="_blank" class="hidden absolute top-6 right-6 bg-indigo-600 text-white font-bold py-2 px-5 rounded-full hover:bg-indigo-700 transition-all duration-300 shadow-lg hover:shadow-xl z-20 flex items-center gap-2">
+                 <a id="apply-button" href="https://docs.google.com/forms/d/e/1FAIpQLSdh89T9IMCNHWrSHPsOrpix81NZU0NmgUNzBPHHqUcE3AJ8XQ/viewform" target="_blank" class="hidden absolute top-4 right-4 sm:top-6 sm:right-6 bg-indigo-600 text-white font-bold py-2 px-4 sm:px-5 rounded-full hover:bg-indigo-700 transition-all duration-300 shadow-lg hover:shadow-xl z-20 flex items-center gap-2">
                     <i class="ph-bold ph-paper-plane-tilt"></i>
                     この求人に応募
                 </a>
@@ -140,11 +140,11 @@
 
     <!-- 求人詳細のテンプレート -->
     <template id="job-details-template">
-        <div id="job-details-scroll-container" class="bg-white rounded-xl shadow-lg p-6 md:p-8 relative h-full overflow-y-auto">
+        <div id="job-details-scroll-container" class="bg-white rounded-xl shadow-lg p-4 sm:p-6 md:p-8 relative h-full overflow-y-auto">
             <button id="back-button" class="md:hidden absolute top-4 left-4 bg-white p-2 rounded-full shadow-md z-10">
                 <i class="ph-bold ph-arrow-left text-lg text-gray-600"></i>
             </button>
-            <div class="text-center md:text-left pt-8 md:pt-0">
+            <div class="text-center md:text-left pt-10 md:pt-0">
                 <div class="inline-flex items-center gap-4 mb-2 p-2 bg-gray-100 rounded-md">
                     <span class="text-sm text-gray-600">求人番号: <span class="font-mono" data-id="求人番号"></span></span>
                     <button class="copy-button bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-bold py-1 px-3 rounded-full flex items-center gap-1">
@@ -156,7 +156,7 @@
                 <p class="text-md text-gray-500 mt-1" data-id="就業場所"></p>
             </div>
             
-            <div class="mt-8 bg-amber-50 rounded-lg p-4">
+            <div class="mt-6 sm:mt-8 bg-amber-50 rounded-lg p-4">
                 <dl class="space-y-2">
                     <div class="grid grid-cols-3 gap-4 items-center">
                         <dt class="text-sm font-semibold text-gray-600 col-span-1">時給</dt>
@@ -166,7 +166,7 @@
                         <dt class="text-sm font-semibold text-gray-600 col-span-1">労働日</dt>
                         <dd class="text-md text-gray-800 col-span-2" data-id="労働日"></dd>
                     </div>
-                    <div class="grid grid-cols-2 gap-x-4 gap-y-2 border-t border-amber-200 pt-2">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 border-t border-amber-200 pt-2">
                         <div class="flex items-center gap-4">
                            <dt class="text-sm font-semibold text-gray-600 flex-shrink-0">労働時間</dt>
                            <dd class="text-md text-gray-800" data-id="労働時間"></dd>
@@ -179,16 +179,16 @@
                 </dl>
             </div>
 
-            <div class="mt-8 space-y-6">
-                <div class="p-5 bg-gray-50 rounded-lg">
+            <div class="mt-6 sm:mt-8 space-y-6 pb-16 sm:pb-0">
+                <div class="p-4 sm:p-5 bg-gray-50 rounded-lg">
                     <h4 class="font-bold text-gray-800 text-lg border-l-4 border-indigo-500 pl-4">求人内容</h4>
                     <p class="mt-3 text-gray-700 whitespace-pre-wrap leading-relaxed" data-id="求人内容"></p>
                 </div>
-                <div class="p-5 bg-gray-50 rounded-lg">
+                <div class="p-4 sm:p-5 bg-gray-50 rounded-lg">
                     <h4 class="font-bold text-gray-800 text-lg border-l-4 border-indigo-500 pl-4">応募要件</h4>
                     <p class="mt-3 text-gray-700 whitespace-pre-wrap leading-relaxed" data-id="応募要件"></p>
                 </div>
-                <div class="p-5 bg-gray-50 rounded-lg">
+                <div class="p-4 sm:p-5 bg-gray-50 rounded-lg">
                     <h4 class="font-bold text-gray-800 text-lg border-l-4 border-indigo-500 pl-4">備考</h4>
                     <p class="mt-3 text-gray-700 whitespace-pre-wrap leading-relaxed" data-id="備考"></p>
                 </div>
