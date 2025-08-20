@@ -123,6 +123,10 @@
             <h3 class="font-bold text-md text-indigo-700" data-id="案件名"></h3>
             <div class="text-sm text-gray-500 mt-2 space-y-1.5">
                 <div class="flex items-center">
+                    <i class="ph-bold ph-user-circle mr-2 text-gray-400 flex-shrink-0"></i>
+                    <span data-id="募集職種"></span>
+                </div>
+                <div class="flex items-center">
                     <i class="ph-bold ph-map-pin-line mr-2 text-gray-400 flex-shrink-0"></i>
                     <span data-id="就業場所"></span>
                 </div>
@@ -153,7 +157,11 @@
                     </button>
                 </div>
                 <h2 class="text-2xl lg:text-3xl font-bold text-gray-900" data-id="案件名"></h2>
-                <p class="text-md text-gray-500 mt-1" data-id="就業場所"></p>
+                <div class="mt-2 inline-flex items-center gap-2 bg-indigo-50 text-indigo-700 font-semibold px-3 py-1 rounded-full text-base">
+                    <i class="ph-bold ph-user-circle"></i>
+                    <span data-id="募集職種"></span>
+                </div>
+                <p class="text-md text-gray-500 mt-2" data-id="就業場所"></p>
             </div>
             
             <div class="mt-6 sm:mt-8 bg-amber-50 rounded-lg p-4">
@@ -290,6 +298,7 @@
                 const originalIndex = allJobs.findIndex(originalJob => originalJob['求人番号'] === job['求人番号']);
 
                 listItemDiv.querySelector('[data-id="案件名"]').textContent = job['案件名'] || 'タイトルなし';
+                listItemDiv.querySelector('[data-id="募集職種"]').textContent = job['募集職種'] || '職種未定';
                 listItemDiv.querySelector('[data-id="就業場所"]').textContent = job['就業場所'] || '勤務地未定';
                 listItemDiv.querySelector('[data-id="時給"]').textContent = job['時給'] || '給与未定';
                 listItemDiv.querySelector('[data-id="労働日"]').textContent = formatDate(job['労働日']) || '労働日未定';
