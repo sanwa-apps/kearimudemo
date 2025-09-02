@@ -1,0 +1,244 @@
+html
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ケアリム | 求人応募</title>
+    <!-- Tailwind CSSの読み込み -->
+    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
+    <!-- Google Fonts (Noto Sans JP) の読み込み -->
+    <link rel="preconnect" href="[https://fonts.googleapis.com](https://fonts.googleapis.com)">
+    <link rel="preconnect" href="[https://fonts.gstatic.com](https://fonts.gstatic.com)" crossorigin>
+    <link href="[https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap](https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap)" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="[https://unpkg.com/@phosphor-icons/web](https://unpkg.com/@phosphor-icons/web)"></script>
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+
+    <header class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl font-bold">ケアリム</h1>
+            <p class="text-sm opacity-80 mt-1">求人応募フォーム</p>
+        </div>
+    </header>
+
+    <main class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg">
+            
+            <!-- 応募求人情報 -->
+            <div class="mb-8 p-4 bg-gray-50 rounded-lg">
+                <h2 class="text-sm font-bold text-gray-700">ご応募希望の求人番号・案件名</h2>
+                <p id="job-title" class="text-xl font-bold text-gray-800 mt-1"></p>
+                <p class="text-xs text-gray-500 mt-1">求人番号: <span id="job-id" class="font-mono"></span> (自動連携)</p>
+            </div>
+
+            <!-- 応募フォーム -->
+            <form id="application-form">
+                <div class="space-y-6">
+                    <!-- お名前 -->
+                    <div>
+                        <label for="name" class="block text-sm font-bold text-gray-700">お名前</label>
+                        <p class="text-xs text-gray-500 mt-1">漢字、フルネームでお願いいたします。</p>
+                        <input type="text" id="name" name="name" required class="mt-2 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+
+                    <!-- LINEご登録名 -->
+                    <div>
+                        <label for="line-name" class="block text-sm font-bold text-gray-700">LINEご登録名</label>
+                        <input type="text" id="line-name" name="lineName" required class="mt-2 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    
+                    <!-- メールアドレス -->
+                    <div>
+                        <label for="email" class="block text-sm font-bold text-gray-700">メールアドレス</label>
+                        <p class="text-xs text-gray-500 mt-1">求人応募完了後、労働条件通知書を送付いたします。ご確認可能なメールアドレスをご記載ください。</p>
+                        <input type="email" id="email" name="email" required class="mt-2 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+
+                    <!-- 所持されている資格 -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700">所持されている資格</label>
+                        <p class="text-xs text-gray-500 mt-1">下記から選択してください。（複数選択可）</p>
+                        <fieldset class="mt-2 space-y-2">
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                <div class="flex items-center">
+                                    <input id="q-kango" name="qualification" type="checkbox" value="看護師" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                    <label for="q-kango" class="ml-2 block text-sm text-gray-900">看護師</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input id="q-junkan" name="qualification" type="checkbox" value="准看護師" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                    <label for="q-junkan" class="ml-2 block text-sm text-gray-900">准看護師</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input id="q-yaku" name="qualification" type="checkbox" value="薬剤師" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                    <label for="q-yaku" class="ml-2 block text-sm text-gray-900">薬剤師</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input id="q-josan" name="qualification" type="checkbox" value="助産師" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                    <label for="q-josan" class="ml-2 block text-sm text-gray-900">助産師</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input id="q-hoken" name="qualification" type="checkbox" value="保健師" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                    <label for="q-hoken" class="ml-2 block text-sm text-gray-900">保健師</label>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <input id="q-other-check" name="qualification" type="checkbox" value="その他" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                <label for="q-other-check" class="ml-2 block text-sm text-gray-900">その他:</label>
+                                <input type="text" id="q-other-text" name="qualification_other" class="ml-2 flex-grow border-gray-300 rounded-md shadow-sm p-2 text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                        </fieldset>
+                    </div>
+
+                    <!-- 勤務可能な日付・お時間帯 -->
+                    <div>
+                        <label for="availability" class="block text-sm font-bold text-gray-700">勤務可能な日付・お時間帯</label>
+                        <textarea id="availability" name="availability" rows="3" class="mt-2 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                    </div>
+                    
+                    <!-- その他、気になる点など -->
+                    <div>
+                        <label for="comments" class="block text-sm font-bold text-gray-700">その他、気になる点など</label>
+                        <textarea id="comments" name="comments" rows="3" class="mt-2 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                    </div>
+
+
+                    <!-- 事前登録 -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700">ケアリムの事前登録は完了していますか</label>
+                        <p class="text-xs text-gray-500 mt-1">★事前登録がまだの方は必ず行っていただくようお願い申し上げます。</p>
+                        <fieldset class="mt-2">
+                            <div class="flex items-center space-x-6">
+                                <div class="flex items-center">
+                                    <input id="reg-yes" name="preRegistered" type="radio" value="はい" required class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                                    <label for="reg-yes" class="ml-2 block text-sm text-gray-900">はい</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input id="reg-no" name="preRegistered" type="radio" value="いいえ" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                                    <label for="reg-no" class="ml-2 block text-sm text-gray-900">いいえ</label>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+
+                <!-- 送信ボタン -->
+                <div class="mt-10">
+                    <button type="submit" id="submit-button" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-full shadow-lg text-lg font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                        応募内容を送信する
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- 送信完了メッセージ -->
+    <div id="success-message" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-8 rounded-xl shadow-2xl text-center max-w-sm">
+            <i class="ph-duotone ph-check-circle text-6xl text-green-500"></i>
+            <h3 class="text-xl font-bold mt-4">応募が完了しました</h3>
+            <p class="text-gray-600 mt-2">ご入力いただいたメールアドレス宛に、今後のご案内をお送りします。このページは閉じていただいて構いません。</p>
+        </div>
+    </div>
+    
+    <script>
+        // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+        // ★ 上の「応募フォーム用 設定ガイド」の手順でコピーしたURLをここに貼り付けてください ★
+        // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzObMPc57O50rLqHozlgeGQFle2eq0ToFypnwCBuSQQQkMOnr5xggnSYcmHZOfo5T8/exec";
+
+        const form = document.getElementById('application-form');
+        const submitButton = document.getElementById('submit-button');
+        const successMessage = document.getElementById('success-message');
+        const jobTitleEl = document.getElementById('job-title');
+        const jobIdEl = document.getElementById('job-id');
+
+        let jobId = '';
+        let jobTitle = '';
+
+        // ページ読み込み時にURLパラメータを取得して表示
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            jobId = params.get('jobId') || 'N/A';
+            jobTitle = params.get('jobTitle') || '不明な求人';
+
+            jobIdEl.textContent = jobId;
+            jobTitleEl.textContent = jobTitle;
+        });
+
+        // フォーム送信時の処理
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === "ここにウェブアプリのURLを貼り付けてください") {
+                alert("エラー: アプリケーションのURLが設定されていません。");
+                return;
+            }
+
+            submitButton.disabled = true;
+            submitButton.innerHTML = `<svg class="animate-spin h-5 w-5 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
+
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            
+            // 資格のチェックボックスの値を処理
+            const qualifications = formData.getAll('qualification').filter(q => q !== 'その他');
+            if (formData.get('qualification')?.includes('その他') && data.qualification_other) {
+                qualifications.push(`その他: ${data.qualification_other}`);
+            }
+            data.qualification = qualifications.join(', ');
+            delete data.qualification_other;
+
+
+            data.jobId = jobId;
+            data.jobTitle = jobTitle;
+
+            try {
+                // Apps ScriptへのPOSTリクエストでは、直接JSONを送ると複雑になる場合があるため
+                // fetchを使いつつ、リダイレクトを利用してデータを送信します。
+                // これによりCORSエラーを回避しやすくなります。
+                
+                const queryParams = new URLSearchParams();
+                for (const key in data) {
+                    queryParams.append(key, data[key]);
+                }
+                
+                // Apps ScriptのdoGetを利用するため、GETリクエストとして送信
+                // Apps Script側でdoPostをdoGetに変更し、e.parameterを利用する必要があります
+                // ただし、これだとURL長制限の可能性があるため、元のdoPost + no-corsが望ましい
+                // ここでは元の実装を維持します
+
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Apps ScriptへのPOSTでは 'no-cors' が必要
+                    cache: 'no-cache',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    redirect: 'follow',
+                    body: JSON.stringify(data)
+                });
+                
+                // no-corsモードではレスポンス内容を確認できないため、成功したとみなす
+                document.querySelector('main').classList.add('hidden');
+                successMessage.classList.remove('hidden');
+
+            } catch (error) {
+                console.error('送信エラー:', error);
+                alert('送信中にエラーが発生しました。時間をおいて再度お試しください。');
+                submitButton.disabled = false;
+                submitButton.textContent = '応募内容を送信する';
+            }
+        });
+    </script>
+
+</body>
+</html>
