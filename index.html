@@ -100,10 +100,10 @@
 
             <!-- Right Column: Job Details -->
             <main id="job-details-column" class="hidden md:block md:col-span-7 lg:col-span-8 xl:col-span-9 w-full h-full relative">
-                 <button id="apply-button" class="hidden absolute top-4 right-4 sm:top-6 sm:right-6 bg-indigo-600 text-white font-bold py-2 px-4 sm:px-5 rounded-full hover:bg-indigo-700 transition-all duration-300 shadow-lg hover:shadow-xl z-20 flex items-center gap-2">
+                 <a id="apply-button" href="#" target="_blank" class="hidden absolute top-4 right-4 sm:top-6 sm:right-6 bg-indigo-600 text-white font-bold py-2 px-4 sm:px-5 rounded-full hover:bg-indigo-700 transition-all duration-300 shadow-lg hover:shadow-xl z-20 flex items-center gap-2">
                     <i class="ph-bold ph-paper-plane-tilt"></i>
                     この求人に応募
-                </button>
+                </a>
                 <div id="job-details-section" class="h-full">
                     <!-- 求人詳細はここに動的に挿入されます -->
                 </div>
@@ -341,11 +341,10 @@
             jobDetailsSection.appendChild(detailsView);
 
             applyButton.classList.remove('hidden');
-            applyButton.onclick = () => {
-                const jobId = job['求人番号'];
-                const jobTitle = job['案件名'];
-                window.open(`application-form.html?jobId=${encodeURIComponent(jobId)}&jobTitle=${encodeURIComponent(jobTitle)}`, '_blank');
-            };
+            const jobId = job['求人番号'];
+            const jobTitle = job['案件名'];
+            applyButton.href = `application-form.html?jobId=${encodeURIComponent(jobId)}&jobTitle=${encodeURIComponent(jobTitle)}`;
+
 
             document.querySelectorAll('.job-list-item').forEach(item => {
                 item.classList.toggle('active', item.dataset.index == index);
@@ -375,7 +374,7 @@
             const placeholder = detailsPlaceholderTemplate.content.cloneNode(true);
             jobDetailsSection.appendChild(placeholder);
             applyButton.classList.add('hidden');
-            applyButton.onclick = null;
+            applyButton.href = '#';
         };
 
         const showStatus = (type, message) => {
