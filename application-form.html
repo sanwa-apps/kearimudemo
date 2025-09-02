@@ -201,18 +201,18 @@
             data.jobTitle = jobTitle;
 
             try {
-                const response = await fetch(APPS_SCRIPT_URL, {
+                // Google Apps Scriptへは fetch API を使ってリダイレクトを介してPOSTする
+                const postResponse = await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors', // Apps ScriptへのPOSTでは 'no-cors' が必要
-                    cache: 'no-cache',
+                    mode: 'no-cors', // CORSエラーを回避するため
+                    body: JSON.stringify(data),
                     headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    redirect: 'follow',
-                    body: JSON.stringify(data)
+                        'Content-Type': 'application/json'
+                    }
                 });
                 
-                // no-corsモードではレスポンス内容を確認できないため、成功したとみなす
+                // no-corsモードではレスポンスが不透明になるため、成功したと仮定して処理を進める
+                console.log('Form submission successful (assumed due to no-cors).');
                 document.querySelector('main').classList.add('hidden');
                 successMessage.classList.remove('hidden');
 
