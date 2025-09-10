@@ -336,15 +336,16 @@
                     copyToClipboard(jobNumber);
                 }
             });
+            
+            // 応募ボタンのリンクを動的に設定
+            const jobId = job['求人番号'];
+            const jobTitle = job['案件名'];
+            const applicationUrl = `application-form.html?jobId=${encodeURIComponent(jobId)}&jobTitle=${encodeURIComponent(jobTitle)}`;
+            applyButton.href = applicationUrl;
 
             jobDetailsSection.innerHTML = '';
             jobDetailsSection.appendChild(detailsView);
-
             applyButton.classList.remove('hidden');
-            const jobId = job['求人番号'];
-            const jobTitle = job['案件名'];
-            applyButton.href = `application-form.html?jobId=${encodeURIComponent(jobId)}&jobTitle=${encodeURIComponent(jobTitle)}`;
-
 
             document.querySelectorAll('.job-list-item').forEach(item => {
                 item.classList.toggle('active', item.dataset.index == index);
@@ -374,7 +375,467 @@
             const placeholder = detailsPlaceholderTemplate.content.cloneNode(true);
             jobDetailsSection.appendChild(placeholder);
             applyButton.classList.add('hidden');
-            applyButton.href = '#';
+        };
+
+        const showStatus = (type, message) => {
+            statusContainer.innerHTML = '';
+            let statusDiv;
+            if (type === 'loading') {
+                statusDiv = `<div class="flex items-center justify-center p-4 bg-blue-50 text-blue-700 rounded-md">
+                                <div class="loader ease-linear rounded-full border-2 border-t-2 border-gray-200 h-6 w-6 mr-3"></div>
+                                <p>${message}</p>
+                             </div>`;
+            } else if (type === 'error') {
+                statusDiv = `<div class="p-4 bg-red-100 text-red-700 rounded-md" role="alert">
+                                <p class="font-bold">エラー</p>
+                                <p>${message}</p>
+                             </div>`;
+            }
+            statusContainer.innerHTML = statusDiv;
+        };
+
+        const loadJobs = async () => {
+            if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes("ここに")) {
+                showStatus('error', 'アプリケーションのURLが設定されていません。');
+                return;
+            }
+
+            showStatus('loading', '求人情報を読み込んでいます...');
+            
+            try {
+                const response = await fetch(APPS_SCRIPT_URL);
+                
+                if (!response.ok) {
+                    throw new Error(`サーバーからの応答エラー: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(`スクリプトエラー: ${data.error}`);
+                }
+
+                allJobs = data;
+                statusContainer.innerHTML = '';
+                filterAndRenderJobs();
+
+            } catch (error) {
+                console.error('読み込みエラー:', error);
+                showStatus('error', `データの読み込みに失敗しました。URLやスクリプトのデプロイ設定を確認してください。詳細: ${error.message}`);
+            }
+        };
+
+        prefectureFilterInput.addEventListener('input', filterAndRenderJobs);
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) {
+                jobsListSection.classList.remove('hidden');
+                document.getElementById('job-details-column').classList.remove('hidden');
+                if (activeJobIndex === -1) {
+                    showPlaceholder();
+                } else {
+                    showJobDetails(activeJobIndex);
+                }
+            } else {
+                if (activeJobIndex !== -1) {
+                    jobsListSection.classList.add('hidden');
+                    document.getElementById('job-details-column').classList.remove('hidden');
+                } else {
+                    jobsListSection.classList.remove('hidden');
+                    document.getElementById('job-details-column').classList.add('hidden');
+                }
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadJobs();
+            if (window.innerWidth >= 768) {
+                 showPlaceholder();
+            } else {
+                document.getElementById('job-details-column').classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ケアリム | 求人情報一覧</title>
+    <!-- Tailwind CSSの読み込み -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (Noto Sans JP) の読み込み -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        /* ローディングスピナーのアニメーション */
+        .loader {
+            border-top-color: #4f46e5;
+            -webkit-animation: spinner 1.5s linear infinite;
+            animation: spinner 1.5s linear infinite;
+        }
+        @-webkit-keyframes spinner {
+            0% { -webkit-transform: rotate(0deg); }
+            100% { -webkit-transform: rotate(360deg); }
+        }
+        @keyframes spinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* 選択中の求人リストアイテムのスタイル */
+        .job-list-item.active {
+            background-color: #eef2ff;
+            border-left-width: 4px;
+            border-color: #6366f1;
+        }
+        /* スクロールバーのスタイル */
+        #jobs-list-container::-webkit-scrollbar,
+        #job-details-scroll-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        #jobs-list-container::-webkit-scrollbar-track,
+        #job-details-scroll-container::-webkit-scrollbar-track {
+            background: #f8fafc; /* bg-slate-50 */
+        }
+        #jobs-list-container::-webkit-scrollbar-thumb,
+        #job-details-scroll-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        #jobs-list-container::-webkit-scrollbar-thumb:hover,
+        #job-details-scroll-container::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+
+    <div class="flex flex-col h-screen">
+        <header class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md sticky top-0 z-30 flex-shrink-0">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4">
+                <div class="flex items-center justify-between">
+                     <h1 class="text-xl sm:text-2xl font-bold">ケアリム <span class="text-base sm:text-lg align-baseline font-normal">テストリリースver</span></h1>
+                     <i class="ph-duotone ph-rocket-launch text-4xl opacity-50"></i>
+                </div>
+                 <div class="mt-2 text-center">
+                    <span class="inline-block bg-white/20 backdrop-blur-sm text-white font-bold px-3 sm:px-4 py-1.5 rounded-full text-sm sm:text-base border border-white/30 shadow-lg">
+                        <i class="ph-fill ph-sparkle text-yellow-300 mr-1"></i>
+                        人気のスポット案件のみ一足先に掲載中！
+                    </span>
+                </div>
+            </div>
+        </header>
+
+        <div id="status-container" class="p-4 flex-shrink-0"></div>
+
+        <div class="flex-grow max-w-7xl w-full mx-auto md:grid md:grid-cols-12 md:gap-6 lg:gap-8 px-4 sm:px-6 lg:px-8 pb-6 min-h-0">
+            
+            <!-- Left Column: Job List -->
+            <aside id="jobs-list-section" class="md:col-span-5 lg:col-span-4 xl:col-span-3 w-full h-full flex flex-col bg-white rounded-xl shadow-lg">
+                <div class="p-4 border-b border-gray-200 flex-shrink-0">
+                    <h2 class="text-lg font-bold text-gray-800">求人一覧</h2>
+                </div>
+                <!-- Filter Section -->
+                <div class="p-4 border-b border-gray-200 flex-shrink-0">
+                    <div class="relative">
+                        <label for="prefecture-filter" class="text-xs font-semibold text-gray-500">都道府県で絞り込み</label>
+                        <input type="text" id="prefecture-filter" placeholder="例：東京都" class="w-full mt-1 p-2 pl-8 border border-gray-300 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                        <i class="ph-bold ph-magnifying-glass absolute left-2.5 top-8 text-gray-400"></i>
+                    </div>
+                </div>
+                <div id="jobs-list-container" class="overflow-y-auto flex-grow min-h-0">
+                    <!-- 求人リストはここに動的に挿入されます -->
+                </div>
+            </aside>
+
+            <!-- Right Column: Job Details -->
+            <main id="job-details-column" class="hidden md:block md:col-span-7 lg:col-span-8 xl:col-span-9 w-full h-full relative">
+                 <a id="apply-button" href="#" target="_blank" class="hidden absolute top-4 right-4 sm:top-6 sm:right-6 bg-indigo-600 text-white font-bold py-2 px-4 sm:px-5 rounded-full hover:bg-indigo-700 transition-all duration-300 shadow-lg hover:shadow-xl z-20 flex items-center gap-2">
+                    <i class="ph-bold ph-paper-plane-tilt"></i>
+                    この求人に応募
+                </a>
+                <div id="job-details-section" class="h-full">
+                    <!-- 求人詳細はここに動的に挿入されます -->
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <div id="toast-notification" class="hidden fixed bottom-5 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-5 py-3 rounded-lg shadow-xl transition-opacity duration-300 z-50">
+        <p id="toast-message"></p>
+    </div>
+
+    <!-- ===== TEMPLATES ===== -->
+
+    <!-- 求人リストアイテムのテンプレート -->
+    <template id="job-list-item-template">
+        <div class="job-list-item cursor-pointer p-4 border-b border-gray-100 hover:bg-indigo-50 transition-colors duration-200">
+            <h3 class="font-bold text-md text-indigo-700" data-id="案件名"></h3>
+            <div class="text-sm text-gray-500 mt-2 space-y-1.5">
+                <div class="flex items-center">
+                    <i class="ph-bold ph-user-circle mr-2 text-gray-400 flex-shrink-0"></i>
+                    <span data-id="募集職種"></span>
+                </div>
+                <div class="flex items-center">
+                    <i class="ph-bold ph-map-pin-line mr-2 text-gray-400 flex-shrink-0"></i>
+                    <span data-id="就業場所"></span>
+                </div>
+                <div class="flex items-center">
+                    <i class="ph-bold ph-coins mr-2 text-gray-400 flex-shrink-0"></i>
+                    <span data-id="時給"></span>
+                </div>
+                <div class="flex items-center">
+                    <i class="ph-bold ph-calendar mr-2 text-gray-400 flex-shrink-0"></i>
+                    <span data-id="労働日"></span>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- 求人詳細のテンプレート -->
+    <template id="job-details-template">
+        <div id="job-details-scroll-container" class="bg-white rounded-xl shadow-lg p-4 sm:p-6 md:p-8 relative h-full overflow-y-auto">
+            <button id="back-button" class="md:hidden absolute top-4 left-4 bg-white p-2 rounded-full shadow-md z-10">
+                <i class="ph-bold ph-arrow-left text-lg text-gray-600"></i>
+            </button>
+            <div class="text-center md:text-left pt-10 md:pt-0">
+                <div class="inline-flex items-center gap-4 mb-2 p-2 bg-gray-100 rounded-md">
+                    <span class="text-sm text-gray-600">求人番号: <span class="font-mono" data-id="求人番号"></span></span>
+                    <button class="copy-button bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-bold py-1 px-3 rounded-full flex items-center gap-1">
+                        <i class="ph-bold ph-copy"></i>
+                        コピー
+                    </button>
+                </div>
+                <h2 class="text-2xl lg:text-3xl font-bold text-gray-900" data-id="案件名"></h2>
+                 <div class="mt-2 inline-flex items-center gap-2 bg-indigo-50 text-indigo-700 font-semibold px-3 py-1 rounded-full text-base">
+                    <i class="ph-bold ph-user-circle"></i>
+                    <span data-id="募集職種"></span>
+                </div>
+                <p class="text-md text-gray-500 mt-2" data-id="就業場所"></p>
+            </div>
+            
+            <div class="mt-6 sm:mt-8 bg-amber-50 rounded-lg p-4">
+                <dl class="space-y-2">
+                    <div class="grid grid-cols-3 gap-4 items-center">
+                        <dt class="text-sm font-semibold text-gray-600 col-span-1">時給</dt>
+                        <dd class="text-xl font-bold text-indigo-600 col-span-2" data-id="時給"></dd>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4 items-start border-t border-amber-200 pt-2">
+                        <dt class="text-sm font-semibold text-gray-600 col-span-1">労働日</dt>
+                        <dd class="text-md text-gray-800 col-span-2" data-id="労働日"></dd>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 border-t border-amber-200 pt-2">
+                        <div class="flex items-center gap-4">
+                           <dt class="text-sm font-semibold text-gray-600 flex-shrink-0">労働時間</dt>
+                           <dd class="text-md text-gray-800" data-id="労働時間"></dd>
+                        </div>
+                        <div class="flex items-center gap-4">
+                           <dt class="text-sm font-semibold text-gray-600 flex-shrink-0">休憩時間</dt>
+                           <dd class="text-md text-gray-800" data-id="休憩時間"></dd>
+                        </div>
+                    </div>
+                </dl>
+            </div>
+
+            <div class="mt-6 sm:mt-8 space-y-6 pb-16 sm:pb-0">
+                <div class="p-4 sm:p-5 bg-gray-50 rounded-lg">
+                    <h4 class="font-bold text-gray-800 text-lg border-l-4 border-indigo-500 pl-4">求人内容</h4>
+                    <p class="mt-3 text-gray-700 whitespace-pre-wrap leading-relaxed" data-id="求人内容"></p>
+                </div>
+                <div class="p-4 sm:p-5 bg-gray-50 rounded-lg">
+                    <h4 class="font-bold text-gray-800 text-lg border-l-4 border-indigo-500 pl-4">応募要件</h4>
+                    <p class="mt-3 text-gray-700 whitespace-pre-wrap leading-relaxed" data-id="応募要件"></p>
+                </div>
+                <div class="p-4 sm:p-5 bg-gray-50 rounded-lg">
+                    <h4 class="font-bold text-gray-800 text-lg border-l-4 border-indigo-500 pl-4">備考</h4>
+                    <p class="mt-3 text-gray-700 whitespace-pre-wrap leading-relaxed" data-id="備考"></p>
+                </div>
+            </div>
+        </div>
+    </template>
+    
+    <!-- 詳細表示前のプレースホルダー -->
+    <template id="details-placeholder-template">
+        <div class="hidden md:flex flex-col items-center justify-center bg-white rounded-xl shadow-lg h-full">
+            <i class="ph-duotone ph-files text-7xl text-gray-300"></i>
+            <p class="mt-4 text-lg text-gray-500">左のリストから求人を選択してください</p>
+        </div>
+    </template>
+
+    <script>
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxj6Bz-V8wKCpm20hBLObHQohcUI19ENwtppua2GrPrp6EQ89X0tJJut3pt6nh58EYz/exec";
+
+        const jobsListContainer = document.getElementById('jobs-list-container');
+        const jobDetailsSection = document.getElementById('job-details-section');
+        const jobsListSection = document.getElementById('jobs-list-section');
+        const statusContainer = document.getElementById('status-container');
+        const applyButton = document.getElementById('apply-button');
+        
+        const jobListItemTemplate = document.getElementById('job-list-item-template');
+        const jobDetailsTemplate = document.getElementById('job-details-template');
+        const detailsPlaceholderTemplate = document.getElementById('details-placeholder-template');
+
+        const prefectureFilterInput = document.getElementById('prefecture-filter');
+
+        let allJobs = []; 
+        let activeJobIndex = -1; 
+
+        const showToast = (message) => {
+            const toast = document.getElementById('toast-notification');
+            const toastMessage = document.getElementById('toast-message');
+            
+            toastMessage.textContent = message;
+            toast.classList.remove('hidden');
+            toast.classList.add('opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0');
+                setTimeout(() => {
+                    toast.classList.add('hidden');
+                }, 300);
+            }, 3000);
+        };
+
+        const copyToClipboard = (text) => {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showToast("求人番号をコピーしました。お申し込み時にご入力ください。");
+            } catch (err) {
+                console.error('コピーに失敗しました', err);
+                showToast("コピーに失敗しました。");
+            }
+            document.body.removeChild(textArea);
+        };
+
+        const formatDate = (dateString) => {
+            if (typeof dateString === 'string' && dateString.includes('T')) {
+                return dateString.split('T')[0];
+            }
+            return dateString;
+        };
+
+        const filterAndRenderJobs = () => {
+            const prefectureFilter = prefectureFilterInput.value.trim().toLowerCase();
+
+            const filteredJobs = allJobs.filter(job => {
+                const prefectureMatch = !prefectureFilter || (job['就業場所'] || '').toLowerCase().includes(prefectureFilter);
+                return prefectureMatch;
+            });
+
+            renderJobList(filteredJobs);
+            
+            if (window.innerWidth >= 768) {
+                showPlaceholder();
+            }
+        };
+
+        const renderJobList = (jobs) => {
+            jobsListContainer.innerHTML = '';
+            if (jobs.length === 0) {
+                jobsListContainer.innerHTML = '<p class="p-4 text-center text-gray-500">該当する求人はありません。</p>';
+                return;
+            }
+            jobs.forEach((job) => {
+                const listItem = jobListItemTemplate.content.cloneNode(true);
+                const listItemDiv = listItem.querySelector('.job-list-item');
+                
+                const originalIndex = allJobs.findIndex(originalJob => originalJob['求人番号'] === job['求人番号']);
+
+                listItemDiv.querySelector('[data-id="案件名"]').textContent = job['案件名'] || 'タイトルなし';
+                listItemDiv.querySelector('[data-id="募集職種"]').textContent = job['募集職種'] || '職種未定';
+                listItemDiv.querySelector('[data-id="就業場所"]').textContent = job['就業場所'] || '勤務地未定';
+                listItemDiv.querySelector('[data-id="時給"]').textContent = job['時給'] || '給与未定';
+                listItemDiv.querySelector('[data-id="労働日"]').textContent = formatDate(job['労働日']) || '労働日未定';
+                
+                listItemDiv.dataset.index = originalIndex;
+                listItemDiv.addEventListener('click', () => showJobDetails(originalIndex));
+                
+                jobsListContainer.appendChild(listItem);
+            });
+        };
+
+        const showJobDetails = (index) => {
+            activeJobIndex = index;
+            const job = allJobs[index];
+            if (!job) return;
+
+            const detailsView = jobDetailsTemplate.content.cloneNode(true);
+            Object.keys(job).forEach(key => {
+                const target = detailsView.querySelector(`[data-id="${key}"]`);
+                if (target) {
+                    let value = job[key] || 'ー';
+                    if (key === '労働日') {
+                        value = formatDate(value);
+                    }
+                    target.textContent = value;
+                }
+            });
+            
+            detailsView.querySelector('#back-button').addEventListener('click', showListView);
+            
+            const copyBtn = detailsView.querySelector('.copy-button');
+            copyBtn.addEventListener('click', () => {
+                const jobNumber = job['求人番号'];
+                if(jobNumber) {
+                    copyToClipboard(jobNumber);
+                }
+            });
+            
+            // 応募ボタンのリンクを動的に設定
+            const jobId = job['求人番号'];
+            const jobTitle = job['案件名'];
+            const applicationUrl = `application-form.html?jobId=${encodeURIComponent(jobId)}&jobTitle=${encodeURIComponent(jobTitle)}`;
+            applyButton.href = applicationUrl;
+
+            jobDetailsSection.innerHTML = '';
+            jobDetailsSection.appendChild(detailsView);
+            applyButton.classList.remove('hidden');
+
+            document.querySelectorAll('.job-list-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.index == index);
+            });
+
+            if (window.innerWidth < 768) {
+                jobsListSection.classList.add('hidden');
+                document.getElementById('job-details-column').classList.remove('hidden');
+            }
+        };
+
+        const showListView = () => {
+            if (window.innerWidth < 768) {
+                document.getElementById('job-details-column').classList.add('hidden');
+                jobsListSection.classList.remove('hidden');
+            }
+            
+            const activeItem = document.querySelector('.job-list-item.active');
+            if(activeItem) activeItem.classList.remove('active');
+            activeJobIndex = -1;
+            
+            showPlaceholder();
+        };
+        
+        const showPlaceholder = () => {
+            jobDetailsSection.innerHTML = '';
+            const placeholder = detailsPlaceholderTemplate.content.cloneNode(true);
+            jobDetailsSection.appendChild(placeholder);
+            applyButton.classList.add('hidden');
         };
 
         const showStatus = (type, message) => {
